@@ -9,10 +9,7 @@ const MainLayout = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const userId = auth();
-  if(!userId) {
-    redirect("/sign-in");
-  }
+  
   return (
   
     <div className="flex flex-col min-h-screen">

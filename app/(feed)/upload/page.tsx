@@ -1,104 +1,85 @@
 "use client";
+
+import Wrapper from "@/components/globals/Wrapper";
 import { cn } from "@/lib/utils";
-import {
-  FileUploadSchemaType,
-  fileUploadSchema,
-} from "@/schemas/file-upload-schema";
-import { ArrowRight, Check } from "lucide-react";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
-import {
-  Field,
-  FieldLabel,
-  FieldGroup,
-  FieldError,
-  FieldDescription,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Upload, Settings2, Sparkles, Eye, Check } from "lucide-react";
+import Link from "next/link";
+import React, { useState } from "react";
+
+type Step = 1 | 2 | 3 | 4;
+
+const steps = [
+  { id: 1 as Step, label: "Upload", icon: Upload },
+  { id: 2 as Step, label: "Configure", icon: Settings2 },
+  { id: 3 as Step, label: "Generate", icon: Sparkles },
+  { id: 4 as Step, label: "Preview", icon: Eye },
+];
 
 const UploadPage = () => {
-  const [step, setStep] = useState(1);
-  const handleNextStep = () => {
-    setStep(step + 1);
-  };
-  const form = useForm<FileUploadSchemaType>({
-    resolver: zodResolver(fileUploadSchema),
-    defaultValues: {
-      file: undefined,
-      title: "",
-      description: "",
-    },
-  });
+  const [step, setStep] = useState<Step>(1);
   return (
-    <div className="space-y-8 w-full h-full flex flex-col justify-center">
-      <div className="flex items-center gap-2 justify-center w-full">
-        {[1, 2].map((s) => (
-          <div key={s} className="flex items-center gap-2">
-            <div
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-colors",
-                step >= s
-                  ? "bg-linear-to-r from-primary/90 via-primary/80 to-primary/70 text-primary-foreground"
-                  : "bg-muted text-muted-foreground",
-              )}
-            >
-              {step > s ? <Check className="w-4 h-4" /> : s}
-            </div>
-            {s < 2 && (
-              <div
-                className={cn(
-                  "w-20 h-1 rounded-full transition-colors",
-                  step > s ? "bg-primary" : "bg-muted",
-                )}
-              />
-            )}
-          </div>
-        ))}
+    <Wrapper className="min-h-screen bg-background">
+      <div className="flex items-center gap-4 my-8">
+        <Link
+          href="/feed"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-border transition-colors hover:bg-secondary"
+        >
+          <ArrowLeft className="h-5 w-5 text-foreground" />
+        </Link>
+        <div className="flex-1">
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            Create Quiz
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Upload a PDF and let AI generate questions for you
+          </p>
+        </div>
       </div>
-      <Form {...form}>
-        <form className="space-y-8">
-          {step === 1 && (
-            <div className="space-y-8">
-              <Controller
-                name="title"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel htmlFor="picture">Upload File</FieldLabel>
-                    <Input
-                      id="picture"
-                      type="file"
-                      className="cursor-pointer p-4 border-dashed border-2 border-gray-300 rounded-md h-16"
+      <div className="mb-10">
+            <div className="flex items-center justify-between">
+              {steps.map((s, i) => (
+                <React.Fragment key={s.id}>
+                  <div className="flex flex-col items-center gap-2">
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
+                        step > s.id
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : step === s.id
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-card text-muted-foreground",
+                      )}
+                    >
+                      {step > s.id ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <s.icon className="h-4 w-4" />
+                      )}
+                    </div>
+                    <span
+                      className={cn(
+                        "text-xs font-medium",
+                        step >= s.id
+                          ? "text-foreground"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {s.label}
+                    </span>
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div
+                      className={cn(
+                        "mb-6 h-0.5 flex-1 rounded-full transition-all",
+                        step > s.id ? "bg-primary" : "bg-border",
+                      )}
                     />
-                    <FieldDescription>
-                      Select a file to upload.
-                    </FieldDescription>
-                  </Field>
-                )}
-              />
-              <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="default"
-                  size="lg"
-                  onClick={handleNextStep}
-                >
-                  Next Step
-                </Button>
-              </div>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
-          )}
-          {step === 2 && (
-            <div className="">
-              <h1>Step 2</h1>
-            </div>
-          )}
-        </form>
-      </Form>
-    </div>
+          </div>
+    </Wrapper>
   );
 };
 
