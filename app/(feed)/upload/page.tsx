@@ -12,6 +12,8 @@ import {
   File,
   ArrowRight,
   FileText,
+  Loader2,
+  Wand2,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useState, useCallback } from "react";
@@ -59,7 +61,7 @@ const steps = [
 ];
 
 const UploadPage = () => {
-  const [step, setStep] = useState<Step>(2);
+  const [step, setStep] = useState<Step>(1);
   const handleNextStep = () => {
     setStep((step + 1) as Step);
   };
@@ -448,7 +450,7 @@ const UploadPage = () => {
                       <Textarea
                         value={field.value || ""}
                         onChange={(e) => field.onChange(e.target.value)}
-                        placeholder="e.g. Generate 10 multiple choice questions for the given PDF..."
+                        placeholder="make the questions more challenging and interesting"
                         rows={4}
                         className="resize-none w-full"
                       />
@@ -470,8 +472,165 @@ const UploadPage = () => {
               </div>
             </div>
           )}
+          {step === 3 && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="relative">
+                <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-primary/10">
+                  <Sparkles
+                    className={cn(
+                      "h-10 w-10 text-primary",
+                      form.getValues("aiprompt") && "animate-pulse",
+                    )}
+                  />
+                </div>
+              </div>
+              <h2 className="mt-8 font-display text-2xl font-bold text-foreground">
+                Generating your quiz...
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Creating {form.getValues("questionCount")}{" "}
+                {form.getValues("difficulty").toLowerCase()} questions from your
+                PDF
+              </p>
+              {form.getValues("aiprompt") && (
+                <div className="mx-auto mt-4 flex max-w-sm items-start gap-2 rounded-xl bg-secondary px-4 py-3 text-left">
+                  <Wand2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <p className="line-clamp-2 text-xs text-muted-foreground">
+                    {form.getValues("aiprompt")}
+                  </p>
+                </div>
+              )}
+              {/* <div className="mt-8 w-full max-w-xs">
+                <div className="h-2 overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
+                    style={{
+                      width: `${Math.min(form.getValues("generationProgress"), 100)}%`,
+                    }}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {generationProgress < 30
+                    ? "Reading document..."
+                    : generationProgress < 60
+                      ? "Extracting key concepts..."
+                      : generationProgress < 90
+                        ? "Generating questions..."
+                        : "Finalizing..."}
+                </p>
+              </div> */}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="default"
+                  size="lg"
+                  onClick={handleNextStep}
+                >
+                  Next Step
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
         </form>
       </Form>
+      {step === 4 && (
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              {form.getValues("subject")}
+            </span>
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+              {form.getValues("questionCount")} questions
+            </span>
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+              {form.getValues("difficulty").toLowerCase()}
+            </span>
+          </div>
+          <div className="rounded-2xl border border-border bg-card">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+              <h3 className="font-display text-lg font-bold text-foreground">
+                Generated Questions
+              </h3>
+              <span className="text-sm text-muted-foreground">
+                {form.getValues("questionCount")} total
+              </span>
+            </div>
+          </div>
+          <div className="divide-y divide-border">
+            {/* MCQ Preview */}
+            <div className="px-6 py-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-bold text-primary">Q1</span>
+                <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  MCQ
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">
+                What is the primary function of enzymes in biological reactions?
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {[
+                  "Provide energy",
+                  "Catalyze reactions",
+                  "Store information",
+                  "Transport molecules",
+                ].map((opt, j) => (
+                  <div
+                    key={opt}
+                    className="rounded-lg border border-border px-3 py-2 text-xs text-foreground"
+                  >
+                    <span className="mr-1 font-bold text-muted-foreground">
+                      {String.fromCharCode(65 + j)}.
+                    </span>
+                    {opt}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* True/False Preview */}
+            <div className="px-6 py-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-bold text-primary">Q2</span>
+                <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  True/False
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">
+                DNA replication is a semi-conservative process.
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-border px-3 py-2.5 text-center text-xs font-medium text-foreground">
+                  True
+                </div>
+                <div className="rounded-lg border border-border px-3 py-2.5 text-center text-xs font-medium text-foreground">
+                  False
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-5">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="text-xs font-bold text-primary">Q3</span>
+                <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  Fill in the Blank
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">
+                {
+                  "The molecule that carries amino acids to ribosomes during translation is called ______."
+                }
+              </p>
+              <div className="mt-3">
+                <div className="rounded-lg border border-dashed border-border px-3 py-2.5 text-xs text-muted-foreground">
+                  Students will type their answer here...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Wrapper>
   );
 };

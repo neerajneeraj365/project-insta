@@ -20,9 +20,7 @@ export const fileUploadSchema = z.object({
     .min(1, "Question count must be at least 1.")
     .max(50, "Question count must be at most 50."),
   questionType: z
-    .array(
-      z.enum(["multiple-choice", "fill-in-the-blank", "true-false"]),
-    )
+    .array(z.enum(["multiple-choice", "fill-in-the-blank", "true-false"]))
     .min(1, "Select at least one question type."),
   difficulty: z.enum(["easy", "medium", "hard"], {
     message: "Invalid difficulty.",
