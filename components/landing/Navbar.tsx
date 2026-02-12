@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { BookOpen, Menu, X, Moon, Sun } from "lucide-react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 
 const navItems = [
   {
@@ -83,6 +84,9 @@ export function Navbar() {
             <Button asChild>
               <Link href="/feed">Feed</Link>
             </Button>
+            <SignOutButton redirectUrl="/">
+              <Button variant="outline">Sign Out</Button>
+            </SignOutButton>
           </SignedIn>
         </div>
 
@@ -90,7 +94,7 @@ export function Navbar() {
         <div className="flex items-center gap-2 md:hidden">
           <Button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex h-9 w-9 items-center cursor-pointer justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:hidden" 
+            className="flex h-9 w-9 items-center cursor-pointer justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:hidden"
             aria-label="Toggle theme"
             variant="ghost"
           >
@@ -141,14 +145,20 @@ export function Navbar() {
                   <Link href="/sign-up">Sign up</Link>
                 </Button>
               </SignedOut>
-
-              <SignedIn>
-                <Button asChild>
-                  <Link href="/feed" className="w-full">
-                    Feed
-                  </Link>
-                </Button>
-              </SignedIn>
+              <div className="grid grid-cols-2 gap-2 w-full">
+                <SignedIn>
+                  <Button asChild className="w-full">
+                    <Link href="/feed" className="w-full">
+                      Feed
+                    </Link>
+                  </Button>
+                  <SignOutButton redirectUrl="/">
+                    <Button variant="outline" className="w-full">
+                      Sign Out
+                    </Button>
+                  </SignOutButton>
+                </SignedIn>
+              </div>
             </div>
           </div>
         </div>
